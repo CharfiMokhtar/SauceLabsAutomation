@@ -115,7 +115,7 @@ public class ManageXray {
         try {
             URL url = new URL("https://xray.cloud.getxray.app/api/v2/export/cucumber?keys=" + testKeys);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            String zipPath = System.getProperty("user.dir") + "features.zip";
+            String zipPath = "features.zip";
             String filesDestination = System.getProperty("user.dir") + "\\src\\test\\resources\\features";
 
             conn.setRequestMethod("GET");
