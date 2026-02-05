@@ -9,6 +9,8 @@ import java.nio.file.Path;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+
+import net.lingala.zip4j.core.ZipFile;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
@@ -17,12 +19,11 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContexts;
 import org.apache.http.util.EntityUtils;
-import org.junit.AfterClass;
 import org.junit.Test;
 
 import javax.net.ssl.SSLContext;
 
-public class ImportXray {
+public class ManageXray {
 
     String clientID = "56752DABA0CC4DACB3AD5E720FFD2C7E";
     String clientSecret = "4702b175d5ff4d20c8fcffcf4334c333452588abf12ff8fd451ebc559749c114";
@@ -108,5 +109,38 @@ public class ImportXray {
         conn.disconnect();
         //Return the result to the caller
         System.out.println(result);
+    }
+
+    public static void downloadFeatureFiles(String testKeys) {
+        try {
+            URL url = new URL("https://xray.cloud.getxray.app/api/v2/export/cucumber?keys=" + testKeys);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            String zipPath = System.getProperty("user.dir") + "features.zip";
+            String filesDestination = System.getProperty("user.dir") + "\\src\\test\\resources\\features";
+
+            conn.setRequestMethod("GET");
+            conn.setRequestProperty("Authorization", "Bearer " + token);
+            conn.setRequestProperty("Content-Type", "application/json");
+
+            InputStream inputStream = conn.getInputStream();
+            FileOutputStream outputStream = new FileOutputStream(zipPath);
+            byte[] buffer = new byte[1024];
+            int bytesRead;
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                outputStream.write(buffer, 0, bytesRead);
+            }
+            outputStream.close();
+            inputStream.close();
+
+            (new ZipFile(zipPath)).extractAll(filesDestination);
+            Files.deleteIfExists(Path.of(zipPath));
+        } catch (Exception e) {
+            System.err.println("Erreur lors du téléchargement des fichiers feature: " + e.getMessage());
+        }
+    }
+
+    @Test
+    public void test() {
+        downloadFeatureFiles("POEI2-700");
     }
 }

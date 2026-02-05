@@ -1,15 +1,8 @@
 package com.example.automation.runners;
 
-import com.example.automation.configuration.ImportXray;
 import io.cucumber.junit.Cucumber;
 import io.cucumber.junit.CucumberOptions;
-import org.junit.AfterClass;
 import org.junit.runner.RunWith;
-
-import java.io.IOException;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
 
 
 @RunWith(Cucumber.class)
