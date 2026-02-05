@@ -1,0 +1,13 @@
+# Default ignored files
+/shelf/
+/.idea/workspace.xml
+
+# On ignore les fichiers compilés (le plus important en Java/Maven)
+/target/
+
+# On ignore les fichiers de configuration de l'IDE
+.idea/
+*.iml
+.settings/
+.classpath
+.project
