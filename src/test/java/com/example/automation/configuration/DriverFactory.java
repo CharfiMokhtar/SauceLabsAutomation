@@ -1,9 +1,11 @@
 package com.example.automation.configuration;
 
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.remote.RemoteWebDriver;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
@@ -23,7 +25,11 @@ public class DriverFactory {
             prefs.put("profile.default_content_settings.popups", 0);
             options.addArguments("--incognito");
             options.setExperimentalOption("prefs", prefs);
-            driver = new ChromeDriver(options);
+            try {
+                driver = new RemoteWebDriver(new URL("http://admin:admin@172.16.14.164:4449/wd/hub"), options);
+            } catch (MalformedURLException e) {
+                throw new RuntimeException(e);
+            }
             driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(3));
             driver.manage().window().maximize();
         }
