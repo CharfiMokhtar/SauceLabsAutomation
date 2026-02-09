@@ -10,6 +10,10 @@ pipeline {
             }
         }
 
+        stage('Export Xray') {
+
+        }
+
         stage('Build & Test') {
             steps {
                 echo 'Execution des tests Cucumber via Maven...'
