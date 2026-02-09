@@ -11,7 +11,6 @@ import org.junit.runner.RunWith;
                 "com.example.automation.utils",
                 "com.example.automation.configuration"
         },
-        tags = "@POEI2-640",
         plugin = { "pretty", "html:target/cucumber-reports.html","json:target/cucumber.json" },
         monochrome = true
 )
