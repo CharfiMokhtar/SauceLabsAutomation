@@ -6,7 +6,7 @@
 /target/
 
 # On ignore les fichiers feature
-/src/test/resources/features/
+/src/test/resources/features/*
 
 # On ignore les fichiers de configuration de l'IDE
 .idea/
