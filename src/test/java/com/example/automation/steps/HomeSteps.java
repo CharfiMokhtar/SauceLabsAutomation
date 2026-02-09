@@ -21,7 +21,6 @@ public class HomeSteps {
         assertTrue(homePage.isDisplayed());
     }
 
-
     @Given("l'utilisateur ajoute le produit {string} au panier")
     public void ajouterAuPanier(String productName) {
         homePage.ajouterAuPanier(productName);

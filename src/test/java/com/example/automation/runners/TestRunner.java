@@ -1,9 +1,17 @@
 package com.example.automation.runners;
 
+import com.example.automation.configuration.ManageXray;
+import io.cucumber.java.BeforeAll;
 import io.cucumber.junit.Cucumber;
 import io.cucumber.junit.CucumberOptions;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 
+import java.io.IOException;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 
 @RunWith(Cucumber.class)
 @CucumberOptions(
@@ -13,14 +21,19 @@ import org.junit.runner.RunWith;
                 "com.example.automation.utils",
                 "com.example.automation.configuration"
         },
-        tags = "not @Jira",
+        tags = "@login",
         plugin = { "pretty", "html:target/cucumber-reports.html","json:target/cucumber.json" },
         monochrome = true
 )
 public class TestRunner {
 
-    /*@AfterClass
+    /*@BeforeClass
+    public static void exportXray() {
+        ManageXray.downloadFeatureFiles("POEI2-700");
+    }
+
+    @AfterClass
     public static void importXray() throws IOException, NoSuchAlgorithmException, KeyStoreException, InterruptedException, KeyManagementException {
-        ImportXray.remonterResultatsXray();
+        ManageXray.remonterResultatsXray();
     }*/
 }
