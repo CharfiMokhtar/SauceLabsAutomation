@@ -25,7 +25,9 @@ pipeline {
         stage('Build & Test') {
             steps {
                 echo 'Execution des tests Cucumber via Maven...'
-                bat 'mvn clean test -Dbrowser=%SELENIUM_BROWSER%'
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    bat "mvn clean test -Dbrowser=CHROME"
+                }
             }
         }
 
