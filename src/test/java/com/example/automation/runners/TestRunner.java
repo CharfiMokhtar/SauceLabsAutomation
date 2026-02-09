@@ -1,18 +1,7 @@
 package com.example.automation.runners;
-
-import com.example.automation.configuration.ManageXray;
-import io.cucumber.java.BeforeAll;
 import io.cucumber.junit.Cucumber;
 import io.cucumber.junit.CucumberOptions;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import java.io.IOException;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
 
 @RunWith(Cucumber.class)
 @CucumberOptions(
@@ -27,8 +16,4 @@ import java.security.NoSuchAlgorithmException;
         monochrome = true
 )
 public class TestRunner {
-    @BeforeClass
-    public static void test() {
-        System.out.println("\n\n\n\n" + System.getProperty("browser") + "\n\n\n\n");
-    }
 }
