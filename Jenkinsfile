@@ -25,7 +25,7 @@ pipeline {
         stage('Build & Test') {
             steps {
                 echo 'Execution des tests Cucumber via Maven...'
-                catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+                catchError(buildResult: 'FAILURE') {
                     bat "mvn clean test -Dbrowser=CHROME"
                 }
             }
