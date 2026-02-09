@@ -15,9 +15,16 @@ pipeline {
         stage('Export features') {
             steps {
                 echo 'Exportation des features depuis Xray...'
-                bat 'curl -H "Content-Type: application/json" -X GET -H "Authorization: Bearer %TOKEN%"  "https://xray.cloud.getxray.app/api/v1/export/cucumber?keys=%TEST_PLAN%" --output features.zip'
+                // Utilisation de doubles guillemets pour protéger les variables et les chemins
+                bat 'curl -H "Content-Type: application/json" -X GET -H "Authorization: Bearer %TOKEN%" "https://xray.cloud.getxray.app/api/v1/export/cucumber?keys=%TEST_PLAN%" --output features.zip'
+
+                // On s'assure que le dossier existe
                 bat 'if not exist "src/test/resources/features" mkdir "src/test/resources/features"'
-                bat 'tar -xf features.zip -C src/test/resources/features'
+
+                // Extraction avec guillemets autour du chemin de destination
+                bat 'tar -xf features.zip -C "src/test/resources/features"'
+
+                // Suppression du zip
                 bat 'del features.zip'
             }
         }
