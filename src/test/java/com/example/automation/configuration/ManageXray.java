@@ -27,7 +27,7 @@ public class ManageXray {
 
     String clientID = "56752DABA0CC4DACB3AD5E720FFD2C7E";
     String clientSecret = "4702b175d5ff4d20c8fcffcf4334c333452588abf12ff8fd451ebc559749c114";
-    static String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0ZW5hbnQiOiJiNmNhZGQwNS1lMzQxLTNmMTctYjU1Zi00OTM0MTI4MWQ4MmEiLCJhY2NvdW50SWQiOiI3MTIwMjA6MGVkNjY4NzAtM2Y2ZC00NzM3LTljMmYtZDQyMTVmM2MyOWRmIiwiaXNYZWEiOmZhbHNlLCJpYXQiOjE3NzAyODI0ODMsImV4cCI6MTc3MDM2ODg4MywiYXVkIjoiNTY3NTJEQUJBMENDNERBQ0IzQUQ1RTcyMEZGRDJDN0UiLCJpc3MiOiJjb20ueHBhbmRpdC5wbHVnaW5zLnhyYXkiLCJzdWIiOiI1Njc1MkRBQkEwQ0M0REFDQjNBRDVFNzIwRkZEMkM3RSJ9.BX_hO_Eo3si2BPr2sGljeV5P7OykNqav0AJn4neeG5s";
+    static String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0ZW5hbnQiOiJiNmNhZGQwNS1lMzQxLTNmMTctYjU1Zi00OTM0MTI4MWQ4MmEiLCJhY2NvdW50SWQiOiI3MTIwMjA6MGVkNjY4NzAtM2Y2ZC00NzM3LTljMmYtZDQyMTVmM2MyOWRmIiwiaXNYZWEiOmZhbHNlLCJpYXQiOjE3NzA2MzI1ODcsImV4cCI6MTc3MDcxODk4NywiYXVkIjoiNTY3NTJEQUJBMENDNERBQ0IzQUQ1RTcyMEZGRDJDN0UiLCJpc3MiOiJjb20ueHBhbmRpdC5wbHVnaW5zLnhyYXkiLCJzdWIiOiI1Njc1MkRBQkEwQ0M0REFDQjNBRDVFNzIwRkZEMkM3RSJ9.7BeWIRxz8e4HsGuhrm9XmU6eWUDYMSaxwsf5ADM63as";
 
     public String getToken() throws IOException, NoSuchAlgorithmException, KeyManagementException {
         // Méthode correcte pour HttpClient 4.x
@@ -140,7 +140,7 @@ public class ManageXray {
     }
 
     @Test
-    public void test() {
-        downloadFeatureFiles("POEI2-700");
+    public void test() throws IOException, NoSuchAlgorithmException, KeyManagementException {
+        downloadFeatureFiles("POEI2-640");
     }
 }

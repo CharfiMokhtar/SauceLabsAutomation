@@ -21,7 +21,7 @@ import java.security.NoSuchAlgorithmException;
                 "com.example.automation.utils",
                 "com.example.automation.configuration"
         },
-        tags = "@login",
+        tags = "@POEI2-640",
         plugin = { "pretty", "html:target/cucumber-reports.html","json:target/cucumber.json" },
         monochrome = true
 )
