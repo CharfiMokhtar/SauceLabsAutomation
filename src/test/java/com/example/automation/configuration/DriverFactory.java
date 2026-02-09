@@ -26,7 +26,7 @@ public class DriverFactory {
             options.addArguments("--incognito");
             options.setExperimentalOption("prefs", prefs);
             try {
-                driver = new RemoteWebDriver(new URL("http://admin:admin@172.16.14.164:4449/wd/hub"), options);
+                driver = new RemoteWebDriver(new URL("http://192.168.1.30:4444/wd/hub"), options);
             } catch (MalformedURLException e) {
                 throw new RuntimeException(e);
             }
