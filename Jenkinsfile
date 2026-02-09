@@ -15,7 +15,7 @@ pipeline {
                 echo 'Execution des tests Cucumber via Maven...'
                 bat 'mvn clean test'
             }
-        }A
+        }
     }
 
     post {
