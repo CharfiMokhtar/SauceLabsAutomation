@@ -7,10 +7,12 @@ pipeline {
 
     stages {
 
-        stage('Checkout') {
+        stage('Export features') {
             steps {
-                // Si ton projet n'est PAS sur Git, on saute cette étape
-                echo 'Projet local - pas de checkout Git'
+                echo 'Exportation des features depuis Xray...'
+                bat 'curl -H "Content-Type: application/json" -X GET -H "Authorization: Bearer %TOKEN%"  "https://xray.cloud.getxray.app/api/v1/export/cucumber?keys=POEI-640" --output features.zip'
+                bat 'tar -xf features.zip -C src\\test\\resources\\features'
+                bat 'delete features.zip'
             }
         }
 
