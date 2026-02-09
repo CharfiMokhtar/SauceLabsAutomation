@@ -23,7 +23,7 @@ pipeline {
 
         stage('Import execution') {
             steps {
-                bat 'curl -H "Content-Type: application/json" -X POST -H "Authorization: Bearer ${TOKEN}"  --data @"target/cucumber.json" https://xray.cloud.getxray.app/api/v1/import/execution/cucumber'
+                bat 'curl -H "Content-Type: application/json" -X POST -H "Authorization: Bearer %TOKEN%"  --data @"target/cucumber.json" https://xray.cloud.getxray.app/api/v1/import/execution/cucumber'
             }
         }
     }
