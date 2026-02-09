@@ -1,13 +1,10 @@
 package com.example.automation.steps;
 
 import com.example.automation.configuration.ConfigReader;
-import com.example.automation.configuration.DriverFactory;
 import com.example.automation.pages.LoginPage;
-import com.example.automation.pages.HomePage;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import org.openqa.selenium.WebDriver;
 
 import static org.junit.Assert.assertTrue;
 
