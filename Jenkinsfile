@@ -23,7 +23,7 @@ pipeline {
         stage('Build & Test') {
             steps {
                 echo 'Execution des tests Cucumber via Maven...'
-                bat 'mvn clean test'
+                bat 'mvn clean test -Dselenium.browser=%SELENIUM_BROWSER%'
             }
         }
 
