@@ -29,6 +29,6 @@ import java.security.NoSuchAlgorithmException;
 public class TestRunner {
     @BeforeClass
     public static void test() {
-        System.out.println(System.getProperty("\n\n\nSELENIUM_BROWSER\n\n\n"));
+        System.out.println("\n\n\n\n" + System.getProperty("SELENIUM_BROWSER") + "\n\n\n\n");
     }
 }
