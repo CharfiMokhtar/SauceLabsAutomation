@@ -6,6 +6,7 @@ import io.cucumber.junit.Cucumber;
 import io.cucumber.junit.CucumberOptions;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.io.IOException;
@@ -26,14 +27,8 @@ import java.security.NoSuchAlgorithmException;
         monochrome = true
 )
 public class TestRunner {
-
-    /*@BeforeClass
-    public static void exportXray() {
-        ManageXray.downloadFeatureFiles("POEI2-700");
+    @BeforeClass
+    public void test() {
+        System.out.println(System.getProperty("\n\n\nSELENIUM_BROWSER\n\n\n"));
     }
-
-    @AfterClass
-    public static void importXray() throws IOException, NoSuchAlgorithmException, KeyStoreException, InterruptedException, KeyManagementException {
-        ManageXray.remonterResultatsXray();
-    }*/
 }

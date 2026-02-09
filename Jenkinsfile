@@ -36,7 +36,6 @@ pipeline {
     }
 
     post {
-
         success {
             echo 'Tests exécutés avec succès 🎉'
         }

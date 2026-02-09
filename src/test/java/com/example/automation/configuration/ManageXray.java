@@ -138,9 +138,4 @@ public class ManageXray {
             System.err.println("Erreur lors du téléchargement des fichiers feature: " + e.getMessage());
         }
     }
-
-    @Test
-    public void test() throws IOException, NoSuchAlgorithmException, KeyManagementException {
-        downloadFeatureFiles("POEI2-640");
-    }
 }
