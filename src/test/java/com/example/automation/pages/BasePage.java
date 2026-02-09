@@ -12,7 +12,7 @@ public class BasePage {
     WebElement submitButton;
 
     public BasePage() {
-        this.driver = DriverFactory.getDriver();;
+        this.driver = DriverFactory.getDriver();
         PageFactory.initElements(driver, this);
     }
 
