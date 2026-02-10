@@ -1,6 +1,8 @@
 package com.example.automation.runners;
+import io.cucumber.java.Before;
 import io.cucumber.junit.Cucumber;
 import io.cucumber.junit.CucumberOptions;
+import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 
 @RunWith(Cucumber.class)
@@ -15,4 +17,8 @@ import org.junit.runner.RunWith;
         monochrome = true
 )
 public class TestRunner {
+    @BeforeClass
+    public static void test() {
+        System.out.println("\n\n\n\n" + System.getProperty("browser") + "\n\n\n\n");
+    }
 }

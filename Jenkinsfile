@@ -8,6 +8,7 @@ pipeline {
     parameters {
         string(name: 'SELENIUM_BROWSER', defaultValue: 'CHROME')
         string(name: 'TEST_PLAN', defaultValue: 'POEI2-989')
+        string(name: 'URL_GRID' defaultValue: 'http://admin:admin@172.16.14.164:4449/wd/hub')
     }
 
     stages {
@@ -25,7 +26,7 @@ pipeline {
         stage('Build & Test') {
             steps {
                 echo 'Execution des tests Cucumber via Maven...'
-                bat "mvn clean test -Dbrowser=CHROME"
+                bat "mvn clean test -DurlGrid=%URL_GRID%"
             }
         }
     }
