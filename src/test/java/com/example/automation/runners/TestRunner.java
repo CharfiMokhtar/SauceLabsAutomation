@@ -19,6 +19,6 @@ import org.junit.runner.RunWith;
 public class TestRunner {
     @BeforeClass
     public static void test() {
-        System.out.println("\n\n\n\n" + System.getProperty("urlGrid") + "\n\n\n\n");
+
     }
 }

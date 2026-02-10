@@ -27,7 +27,7 @@ public class DriverFactory {
             options.addArguments("--headless=new");
             options.setExperimentalOption("prefs", prefs);
             try {
-                driver = new RemoteWebDriver(new URL("http://admin:admin@172.16.14.164:4449/wd/hub"), options);
+                driver = new RemoteWebDriver(new URL(System.getProperty("urlGrid")), options);
             } catch (MalformedURLException e) {
                 throw new RuntimeException(e);
             }
