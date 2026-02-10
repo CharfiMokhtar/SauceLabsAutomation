@@ -24,6 +24,7 @@ public class DriverFactory {
             prefs.put("profile.password_manager_enabled", false);
             prefs.put("profile.default_content_settings.popups", 0);
             options.addArguments("--incognito");
+            options.addArguments("--headless=new");
             options.setExperimentalOption("prefs", prefs);
             try {
                 driver = new RemoteWebDriver(new URL("http://admin:admin@172.16.14.164:4449/wd/hub"), options);
