@@ -5,9 +5,6 @@
 # On ignore les fichiers compilés (le plus important en Java/Maven)
 /target/
 
-# On ignore les fichiers feature
-/src/test/resources/features/*
-
 # On ignore les fichiers de configuration de l'IDE
 .idea/
 *.iml
