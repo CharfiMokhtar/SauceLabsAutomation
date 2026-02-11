@@ -46,12 +46,7 @@ pipeline {
                 }"""
                 writeFile file: 'info.json', text: metadata
 
-                bat """
-                    curl -H "Authorization: Bearer %TOKEN%" ^
-                    -F "info=@info.json" ^
-                    -F "result=@target/cucumber.json" ^
-                    "https://xray.cloud.getxray.app/api/v1/import/execution/cucumber/multipart"
-                """
+                bat 'curl -H "Content-Type: multipart/form-data" -X POST -F info=@info.json -F results=@target/cucumber.json -H "Authorization: Bearer %TOKEN%" https://xray.cloud.getxray.app/api/v2/import/execution/cucumber/multipart'
             }
         }
 
