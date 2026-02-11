@@ -26,8 +26,10 @@ public class DriverFactory {
             options.addArguments("--incognito");
             options.addArguments("--headless=new");
             options.setExperimentalOption("prefs", prefs);
+
+            String url = System.getProperty("urlGrid");
             try {
-                driver = new RemoteWebDriver(new URL(System.getProperty("urlGrid")), options);
+                driver = new RemoteWebDriver(new URL(url), options);
             } catch (MalformedURLException e) {
                 throw new RuntimeException(e);
             }
