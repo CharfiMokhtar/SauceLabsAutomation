@@ -34,7 +34,25 @@ pipeline {
     post {
         always {
             echo 'Importation des résultats d\'exécution vers Xray...'
-            bat 'curl -H "Content-Type: application/json" -X POST -H "Authorization: Bearer %TOKEN%"  --data @"target/cucumber.json" https://xray.cloud.getxray.app/api/v1/import/execution/cucumber'
+
+            def metadata = """
+                {
+                    "info": {
+                    "summary": "${params.EXEC_NAME} - ${params.TEST_PLAN}",
+                    "description": "Exécution automatique générée par Jenkins",
+                    "testPlanKey": "${params.TEST_PLAN}"
+                    }
+                }
+            """
+            writeFile file: 'info.json', text: metadata
+
+
+            bat """
+                curl -H "Authorization: Bearer %TOKEN%" ^
+                -F "info=@info.json" ^
+                -F "result=@target/cucumber.json" ^
+                "https://xray.cloud.getxray.app/api/v1/import/execution/cucumber/multipart"
+                """
         }
 
         success {
