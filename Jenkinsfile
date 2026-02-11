@@ -37,23 +37,21 @@ pipeline {
             echo 'Importation des résultats d\'exécution vers Xray...'
 
             script {
-                // Création d'un objet propre
                 def metadataMap = [
                     info: [
-                        summary: "${params.EXEC_NAME} - ${params.TEST_PLAN}",
-                        description: "Exécution automatique générée par Jenkins",
-                        testPlanKey: "${params.TEST_PLAN}"
+                        summary: "${params.EXEC_NAME} - ${params.TEST_PLAN}".toString(),
+                        description: "Execution automatique generee par Jenkins", // Suppression des accents
+                        testPlanKey: "${params.TEST_PLAN}".toString()
                     ]
                 ]
-
-                // Transformation en String JSON
                 def metadataJson = groovy.json.JsonOutput.toJson(metadataMap)
 
-                // Écriture du fichier
-                writeFile file: 'info.json', text: metadataJson, encoding: "UTF-8"
+                // Utilisation de l'encodage standard Jenkins
+                writeFile file: 'info.json', text: metadataJson
 
-                // Exécution du curl
-                bat 'curl -H "Content-Type: multipart/form-data" -X POST -F "info=@info.json" -F "results=@target/cucumber.json" -H "Authorization: Bearer %TOKEN%" https://xray.cloud.getxray.app/api/v2/import/execution/cucumber/multipart'
+                // Vérification du contenu dans la console
+                bat 'type info.json'
+                bat 'curl -H "Content-Type: multipart/form-data" -X POST -F "info=@info.json;type=application/json" -F "results=@target/cucumber.json" -H "Authorization: Bearer %TOKEN%" https://xray.cloud.getxray.app/api/v2/import/execution/cucumber/multipart'
             }
         }
 
