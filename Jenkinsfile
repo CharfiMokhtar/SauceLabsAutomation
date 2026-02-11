@@ -9,6 +9,7 @@ pipeline {
         string(name: 'SELENIUM_BROWSER', defaultValue: 'CHROME')
         string(name: 'TEST_PLAN', defaultValue: 'POEI2-989')
         string(name: 'URL_GRID', defaultValue: 'http://172.16.14.164:4449/wd/hub')
+        string(name: 'EXEC_NAME', defaultValue: 'Execution Jenkins')
     }
 
     stages {
