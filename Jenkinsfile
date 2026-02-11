@@ -42,7 +42,8 @@ pipeline {
                         project: [key: "POEI2"],
                         summary: "${params.EXEC_NAME} - ${params.TEST_PLAN}".toString(),
                         description: "Execution automatique generee par Jenkins",
-                        issuetype: [name: "Test Execution"]
+                        issuetype: [name: "Test Execution"],
+                        labels: ["Mokhtar"]
                     ],
                     xrayFields: [
                         testPlanKey: params.TEST_PLAN
