@@ -50,10 +50,8 @@ pipeline {
                 ]
                 def metadataJson = groovy.json.JsonOutput.toJson(metadataMap)
 
-                // Utilisation de l'encodage standard Jenkins
                 writeFile file: 'info.json', text: metadataJson
 
-                // Vérification du contenu dans la console
                 bat 'type info.json'
                 bat 'curl -H "Content-Type: multipart/form-data" -X POST -F "info=@info.json;type=application/json" -F "results=@target/cucumber.json" -H "Authorization: Bearer %TOKEN%" https://xray.cloud.getxray.app/api/v2/import/execution/cucumber/multipart'
             }
