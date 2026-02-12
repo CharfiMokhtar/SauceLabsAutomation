@@ -43,7 +43,8 @@ pipeline {
                         summary: "${params.EXEC_NAME} - ${params.TEST_PLAN}".toString(),
                         description: "Execution automatique generee par Jenkins",
                         issuetype: [name: "Test Execution"],
-                        labels: ["Mokhtar"]
+                        labels: ["Mokhtar"],
+                        reporter: [accountId: "712020:0ed66870-3f6d-4737-9c2f-d4215f3c29df"]
                     ],
                     xrayFields: [
                         testPlanKey: params.TEST_PLAN
