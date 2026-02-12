@@ -44,7 +44,7 @@ pipeline {
                         description: "Execution automatique generee par Jenkins",
                         issuetype: [name: "Test Execution"],
                         labels: ["Mokhtar"],
-                        reporter: [accountId: "712020:0ed66870-3f6d-4737-9c2f-d4215f3c29df"]
+                        reporter: [accountId: "712020:0ed66870-3f6d-4737-9c2f-d4215f3c29df?cloudId=44b031c3-be43-4b09-ba30-f624689be584"]
                     ],
                     xrayFields: [
                         testPlanKey: params.TEST_PLAN
