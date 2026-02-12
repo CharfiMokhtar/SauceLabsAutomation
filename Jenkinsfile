@@ -43,11 +43,11 @@ pipeline {
                         summary: "${params.EXEC_NAME} - ${params.TEST_PLAN}".toString(),
                         description: "Execution automatique generee par Jenkins",
                         issuetype: [name: "Test Execution"],
-                        labels: ["Mokhtar"]
+                        labels: ["Mokhtar"],
+                        assignee: [accountId: "712020:0ed66870-3f6d-4737-9c2f-d4215f3c29df"]
                     ],
                     xrayFields: [
-                        testPlanKey: params.TEST_PLAN,
-                        reporterAccountId: "712020:0ed66870-3f6d-4737-9c2f-d4215f3c29df?cloudId=44b031c3-be43-4b09-ba30-f624689be584"
+                        testPlanKey: params.TEST_PLAN
                     ]
                 ]
                 def metadataJson = groovy.json.JsonOutput.toJson(metadataMap)
