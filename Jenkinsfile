@@ -40,7 +40,7 @@ pipeline {
                 def metadataMap = [
                     fields: [
                         project: [key: "POEI2"],
-                        summary: "${params.EXEC_NAME} - ${params.TEST_PLAN}".toString() - build#${env.BUILD_NUMBER},
+                        summary: "${params.EXEC_NAME} - ${params.TEST_PLAN} - build#${env.BUILD_NUMBER}".toString(),
                         description: "Execution automatique generee par Jenkins",
                         issuetype: [name: "Test Execution"],
                         labels: ["Mokhtar"],
