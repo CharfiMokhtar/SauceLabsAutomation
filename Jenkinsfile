@@ -7,9 +7,10 @@ pipeline {
 
     parameters {
         string(name: 'SELENIUM_BROWSER', defaultValue: 'CHROME')
-        string(name: 'TEST_PLAN', defaultValue: 'POEI2-989')
-        string(name: 'URL_GRID', defaultValue: 'http://172.16.14.164:4449/wd/hub')
-        string(name: 'EXEC_NAME', defaultValue: 'Execution Jenkins')
+        string(name: 'TEST_PLAN',        defaultValue: 'POEI2-989')
+        string(name: 'TEST_EXEC',        defaultValue: 'POEI2-1176')  // ← Ticket Test Execution cible
+        string(name: 'URL_GRID',         defaultValue: 'http://172.16.14.164:4449/wd/hub')
+        string(name: 'EXEC_NAME',        defaultValue: 'Execution Jenkins')
     }
 
     stages {
@@ -17,7 +18,7 @@ pipeline {
         stage('Export features') {
             steps {
                 echo 'Exportation des features depuis Xray...'
-                bat 'curl -H "Content-Type: application/json" -X GET -H "Authorization: Bearer %TOKEN%"  "https://xray.cloud.getxray.app/api/v1/export/cucumber?keys=%TEST_PLAN%" --output features.zip'
+                bat 'curl -H "Content-Type: application/json" -X GET -H "Authorization: Bearer %TOKEN%" "https://xray.cloud.getxray.app/api/v1/export/cucumber?keys=%TEST_PLAN%" --output features.zip'
                 bat 'if not exist "src/test/resources/features" mkdir "src/test/resources/features"'
                 bat 'tar -xf features.zip -C src/test/resources/features'
                 bat 'del features.zip'
@@ -37,26 +38,14 @@ pipeline {
             echo 'Importation des résultats d\'exécution vers Xray...'
 
             script {
-                def metadataMap = [
-                    fields: [
-                        project: [key: "POEI2"],
-                        summary: "${params.EXEC_NAME} - ${params.TEST_PLAN} - build#${env.BUILD_NUMBER}".toString(),
-                        description: "Execution automatique generee par Jenkins",
-                        issuetype: [name: "Test Execution"],
-                        labels: ["Mokhtar"],
-                        assignee: [accountId: "712020:0ed66870-3f6d-4737-9c2f-d4215f3c29df"]
-                    ],
-                    xrayFields: [
-                        testExecutionKey: "POEI2-1176",
-                        testPlanKey: params.TEST_PLAN
-                    ]
-                ]
-                def metadataJson = groovy.json.JsonOutput.toJson(metadataMap)
+                def xrayUrl = "https://xray.cloud.getxray.app/api/v2/import/execution/cucumber?testExecIssueKey=${params.TEST_EXEC}"
+                echo "Mise à jour de la Test Execution : ${params.TEST_EXEC}"
 
-                writeFile file: 'info.json', text: metadataJson
-
-                bat 'type info.json'
-                bat 'curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer %TOKEN%" --data "@target/cucumber.json" "https://xray.cloud.getxray.app/api/v2/import/execution/cucumber"'
+                bat """curl -X POST ^
+                    -H "Content-Type: application/json" ^
+                    -H "Authorization: Bearer %TOKEN%" ^
+                    --data "@target/cucumber.json" ^
+                    "${xrayUrl}" """
             }
         }
 
