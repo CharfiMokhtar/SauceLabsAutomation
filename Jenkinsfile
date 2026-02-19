@@ -47,7 +47,7 @@ pipeline {
                         assignee: [accountId: "712020:0ed66870-3f6d-4737-9c2f-d4215f3c29df"]
                     ],
                     xrayFields: [
-                        testExecutionKey: "POEI2-1176",
+                        testExecutionKey: "POEI2-1176"
                         testPlanKey: params.TEST_PLAN
                     ]
                 ]
@@ -56,7 +56,7 @@ pipeline {
                 writeFile file: 'info.json', text: metadataJson
 
                 bat 'type info.json'
-                bat 'curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer %TOKEN%" --data "@target/cucumber.json" "https://xray.cloud.getxray.app/api/v2/import/execution/cucumber?testExecutionKey=POEI2-1176"'
+                bat 'curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer %TOKEN%" --data "@target/cucumber.json" "https://xray.cloud.getxray.app/api/v2/import/execution/cucumber"'
             }
         }
 
