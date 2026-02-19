@@ -40,7 +40,6 @@ pipeline {
                 def metadataMap = [
                     fields: [
                         project: [key: "POEI2"],
-                        testExecKey: "POEI2-1176",
                         summary: "${params.EXEC_NAME} - ${params.TEST_PLAN} - build#${env.BUILD_NUMBER}".toString(),
                         description: "Execution automatique generee par Jenkins",
                         issuetype: [name: "Test Execution"],
@@ -56,7 +55,7 @@ pipeline {
                 writeFile file: 'info.json', text: metadataJson
 
                 bat 'type info.json'
-                bat 'curl -H "Content-Type: multipart/form-data" -X POST -F "info=@info.json;type=application/json" -F "results=@target/cucumber.json" -H "Authorization: Bearer %TOKEN%" https://xray.cloud.getxray.app/api/v2/import/execution/cucumber/multipart'
+                bat 'curl -H "Content-Type: multipart/form-data" -X POST -F "info=@info.json;type=application/json" -F "results=@target/cucumber.json" -H "Authorization: Bearer %TOKEN%" https://xray.cloud.getxray.app/api/v2/import/execution/cucumber/multipart?testExecKey=POEI2-1176'
             }
         }
 
