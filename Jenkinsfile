@@ -113,11 +113,18 @@ pipeline {
         always {
             echo 'Importation des résultats vers Xray...'
             script {
-                bat """curl -X POST ^
-                    -H "Content-Type: application/json" ^
-                    -H "Authorization: Bearer %TOKEN%" ^
-                    --data "@target/cucumber.json" ^
-                    "https://xray.cloud.getxray.app/api/v2/import/execution/cucumber" """
+                // Importer séparément vers chaque Test Execution trouvée
+                def keys = env.TNR_EXEC_KEYS.split(';')
+                keys.each { execKey ->
+                    def infoJson = """{"fields": {"project": {"key": "POEI2"}, "issuetype": {"name": "Test Execution"}}, "xrayFields": {"testExecKey": "${execKey}"}}"""
+                    writeFile file: "info_${execKey}.json", text: infoJson
+
+                    bat """curl -X POST ^
+                        -H "Authorization: Bearer %TOKEN%" ^
+                        -F "info=@info_${execKey}.json;type=application/json" ^
+                        -F "results=@target/cucumber.json;type=application/json" ^
+                        "https://xray.cloud.getxray.app/api/v2/import/execution/cucumber/multipart" """
+                }
             }
         }
         success { echo 'Tests exécutés avec succès 🎉' }
