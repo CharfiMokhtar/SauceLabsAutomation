@@ -37,7 +37,7 @@ pipeline {
             echo 'Importation des résultats d\'exécution vers Xray...'
 
             script {
-                def metadataMap = [
+                /*def metadataMap = [
                     fields: [
                         project: [key: "POEI2"],
                         summary: "${params.EXEC_NAME} - ${params.TEST_PLAN} - build#${env.BUILD_NUMBER}".toString(),
@@ -54,8 +54,8 @@ pipeline {
 
                 writeFile file: 'info.json', text: metadataJson
 
-                bat 'type info.json'
-                bat 'curl -H "Content-Type: multipart/form-data" -X POST -F "info=@info.json;type=application/json" -F "results=@target/cucumber.json" -H "Authorization: Bearer %TOKEN%" https://xray.cloud.getxray.app/api/v2/import/execution/cucumber/multipart'
+                bat 'type info.json'*/
+                bat 'curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer %TOKEN%" --data "@target/cucumber.json" "https://xray.cloud.getxray.app/api/v2/import/execution/cucumber?testExecutionKey=POEI2-1176"
             }
         }
 
