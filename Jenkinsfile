@@ -99,32 +99,3 @@ pipeline {
         failure { echo 'Des tests ont échoué ❌' }
     }
 }
-```
-
----
-
-## 📊 Flux complet
-```
-TEST_PLAN (POEI2-989)
-        │
-        ▼
-JQL Jira API
-issuetype="Test Execution"
-AND "Test Plan" = POEI2-989
-AND labels = "TNR"
-        │
-        ▼
-[ POEI2-1176, POEI2-1200, ... ]  ← seulement les TNR
-        │
-        ▼
-GET /export/cucumber?keys=POEI2-1176;POEI2-1200
-        │  (features contiennent @POEI2-1176 et @POEI2-1200)
-        ▼
-mvn clean test
-        │
-        ▼
-POST /import/execution/cucumber
-        │  (Xray lit les tags → met à jour chaque exec automatiquement)
-        ▼
-POEI2-1176 ✅ mis à jour
-POEI2-1200 ✅ mis à jour
