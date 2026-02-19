@@ -116,7 +116,7 @@ pipeline {
                 // Importer séparément vers chaque Test Execution trouvée
                 def keys = env.TNR_EXEC_KEYS.split(';')
                 keys.each { execKey ->
-                    def infoJson = """{"fields": {"project": {"key": "POEI2"}, "issuetype": {"name": "Test Execution"}}, "xrayFields": {"testExecKey": "${execKey}"}}"""
+                    def infoJson = """{"fields": {"project": {"key": "POEI2"}, "issuetype": {"name": "Test Execution"}}, "xrayFields": {"testExecutionKey": "${execKey}"}}"""
                     writeFile file: "info_${execKey}.json", text: infoJson
 
                     bat """curl -X POST ^
