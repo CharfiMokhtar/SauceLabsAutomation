@@ -2,15 +2,14 @@ pipeline {
     agent any
 
     environment {
-        TOKEN        = credentials('TOKEN')
-        JIRA_BASE_URL = 'https://team-1612820401992.atlassian.net'
+        TOKEN = credentials('TOKEN')
     }
 
     parameters {
         string(name: 'SELENIUM_BROWSER', defaultValue: 'CHROME')
         string(name: 'TEST_PLAN',        defaultValue: 'POEI2-989')
-        string(name: 'TNR_LABEL',        defaultValue: 'Mokhtar')        // ← tag à filtrer
-        string(name: 'URL_GRID',         defaultValue: 'http://192.168.1.30:4444/wd/hub')
+        string(name: 'TNR_LABEL',        defaultValue: 'TNR')
+        string(name: 'URL_GRID',         defaultValue: 'http://172.16.14.164:4449/wd/hub')
         string(name: 'EXEC_NAME',        defaultValue: 'Execution Jenkins')
     }
 
@@ -18,34 +17,63 @@ pipeline {
 
         stage('Récupération des Test Executions TNR') {
             steps {
-                echo "Recherche des Test Executions du plan ${params.TEST_PLAN} avec le label ${params.TNR_LABEL}..."
+                echo "Recherche des Test Executions [${params.TNR_LABEL}] du plan ${params.TEST_PLAN}..."
 
                 script {
-                    // JQL : Test Executions liées au Test Plan ET ayant le label TNR
-                    def jql = """issuetype = \"Test Execution\" AND \"Test Plan\" = ${params.TEST_PLAN} AND labels = \"${params.TNR_LABEL}\""""
-                    def encodedJql = jql.replace(' ', '%20').replace('"', '%22').replace('=', '%3D')
 
-                    bat """curl -s -X GET ^
+                    // ── ÉTAPE 1 : récupérer l'issueId interne du Test Plan ──────────
+                    def graphqlStep1 = """{"query":"{ getTestPlans(jql: \\"key = ${params.TEST_PLAN}\\", limit: 1) { results { issueId } } }"}"""
+                    writeFile file: 'gql_step1.json', text: graphqlStep1
+
+                    bat """curl -s -X POST ^
                         -H "Authorization: Bearer %TOKEN%" ^
                         -H "Content-Type: application/json" ^
-                        "%JIRA_BASE_URL%/rest/api/2/search?jql=issuetype%%3D%%22Test%%20Execution%%22%%20AND%%20%%22Test%%20Plan%%22%%3D%%20${params.TEST_PLAN}%%20AND%%20labels%%3D%%22${params.TNR_LABEL}%%22&fields=key,summary,labels&maxResults=50" ^
-                        -o testexec_tnr.json"""
+                        --data "@gql_step1.json" ^
+                        "https://xray.cloud.getxray.app/api/v2/graphql" ^
+                        -o step1_response.json"""
 
-                    bat 'type testexec_tnr.json'
+                    bat 'type step1_response.json'
 
-                    // Extraire les clés avec PowerShell
-                    bat '''powershell -Command "
-                        $json = Get-Content testexec_tnr.json | ConvertFrom-Json;
-                        $total = $json.total;
-                        Write-Host ('Total Test Executions TNR trouvees : ' + $total);
-                        if ($total -eq 0) { Write-Error 'Aucune Test Execution TNR trouvee !'; exit 1 }
-                        $keys = ($json.issues | ForEach-Object { $_.key }) -join ';';
-                        Write-Host ('Cles : ' + $keys);
-                        Set-Content -Path tnr_exec_keys.txt -Value $keys
-                    "'''
+                    // Extraire l'issueId avec PowerShell
+                    def issueId = bat(
+                        returnStdout: true,
+                        script: '''@powershell -NoProfile -Command "
+                            $json = Get-Content step1_response.json | ConvertFrom-Json;
+                            $json.data.getTestPlans.results[0].issueId
+                        "'''
+                    ).trim()
 
-                    def execKeys = readFile('tnr_exec_keys.txt').trim()
-                    echo "✅ Test Executions TNR trouvées : ${execKeys}"
+                    echo "issueId du Test Plan : ${issueId}"
+
+                    // ── ÉTAPE 2 : récupérer les Test Executions avec leurs labels ───
+                    def graphqlStep2 = """{"query":"{ getTestPlan(issueId: \\"${issueId}\\") { testExecutions(limit: 50) { results { issueId jira(fields: [\\"key\\", \\"labels\\"]) } } } }"}"""
+                    writeFile file: 'gql_step2.json', text: graphqlStep2
+
+                    bat """curl -s -X POST ^
+                        -H "Authorization: Bearer %TOKEN%" ^
+                        -H "Content-Type: application/json" ^
+                        --data "@gql_step2.json" ^
+                        "https://xray.cloud.getxray.app/api/v2/graphql" ^
+                        -o step2_response.json"""
+
+                    bat 'type step2_response.json'
+
+                    // Filtrer les Test Executions ayant le label TNR
+                    def tnrLabel = params.TNR_LABEL
+                    def execKeys = bat(
+                        returnStdout: true,
+                        script: """@powershell -NoProfile -Command "
+                            \\$json = Get-Content step2_response.json | ConvertFrom-Json;
+                            \\$executions = \\$json.data.getTestPlan.testExecutions.results;
+                            \\$filtered = \\$executions | Where-Object {
+                                \\$_.jira.fields.labels -contains '${tnrLabel}'
+                            };
+                            if (-not \\$filtered) { Write-Error 'Aucune Test Execution avec le label ${tnrLabel}'; exit 1 }
+                            (\\$filtered | ForEach-Object { \\$_.jira.key }) -join ';'
+                        """
+                    ).trim()
+
+                    echo "✅ Test Executions ${params.TNR_LABEL} trouvées : ${execKeys}"
                     env.TNR_EXEC_KEYS = execKeys
                 }
             }
@@ -53,12 +81,11 @@ pipeline {
 
         stage('Export features') {
             steps {
-                echo "Export des features depuis les Test Executions TNR : ${env.TNR_EXEC_KEYS}"
+                echo "Export des features depuis : ${env.TNR_EXEC_KEYS}"
 
                 script {
                     bat 'if not exist "src\\test\\resources\\features" mkdir "src\\test\\resources\\features"'
 
-                    // Export de toutes les executions TNR en une seule requête (clés séparées par ;)
                     bat """curl -s -X GET ^
                         -H "Content-Type: application/json" ^
                         -H "Authorization: Bearer %TOKEN%" ^
@@ -67,7 +94,6 @@ pipeline {
 
                     bat 'tar -xf features.zip -C src/test/resources/features'
                     bat 'del features.zip'
-
                     echo "✅ Features exportées avec succès"
                 }
             }
@@ -85,8 +111,7 @@ pipeline {
         always {
             echo 'Importation des résultats vers Xray...'
             script {
-                // Les tags @POEI2-XXXX dans les .feature guident l'import
-                // vers chaque Test Execution concernée automatiquement
+                // Les tags @POEI2-XXXX dans les .feature guident l'import automatiquement
                 bat """curl -X POST ^
                     -H "Content-Type: application/json" ^
                     -H "Authorization: Bearer %TOKEN%" ^
@@ -94,7 +119,6 @@ pipeline {
                     "https://xray.cloud.getxray.app/api/v2/import/execution/cucumber" """
             }
         }
-
         success { echo 'Tests exécutés avec succès 🎉' }
         failure { echo 'Des tests ont échoué ❌' }
     }
