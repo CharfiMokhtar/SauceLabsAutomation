@@ -35,9 +35,11 @@ pipeline {
     post {
         always {
             echo 'Importation des résultats d\'exécution vers Xray...'
-            def resultsFile = "target/cucumber.json"
-            bat 'curl -H "Content-Type: application/json" -X POST -H "Authorization: Bearer %TOKEN%" --data @${resultsFile} "https://xray.cloud.getxray.app/api/v1/import/execution/cucumber?testExecKey=${params.TEST_EXEC}'
 
+            script {
+                def resultsFile = "target/cucumber.json"
+                bat 'curl -H "Content-Type: application/json" -X POST -H "Authorization: Bearer %TOKEN%" --data @${resultsFile} "https://xray.cloud.getxray.app/api/v1/import/execution/cucumber?testExecKey=${params.TEST_EXEC}"'
+            }
         }
 
         success {
