@@ -85,7 +85,8 @@ pipeline {
             steps {
                 echo "Export des features depuis : ${env.TNR_EXEC_KEYS}"
                 script {
-                    bat 'if not exist "src\\test\\resources\\features" mkdir "src\\test\\resources\\features"'
+                    bat 'if exist "src\\test\\resources\\features" rmdir /s /q "src\\test\\resources\\features"'
+                    bat 'mkdir "src\\test\\resources\\features"'
 
                     bat """curl -s -X GET ^
                         -H "Content-Type: application/json" ^
