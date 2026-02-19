@@ -32,18 +32,17 @@ pipeline {
                         "https://xray.cloud.getxray.app/api/v2/graphql" ^
                         -o step1_response.json"""
 
-                    bat 'type step1_response.json'
-
-                    // Extraire l'issueId avec PowerShell
+                    // ✅ Script PS1 externe → zéro problème d'échappement
+                    writeFile file: 'extract_id.ps1', text: '''
+                        $json = Get-Content step1_response.json | ConvertFrom-Json
+                        $json.data.getTestPlans.results[0].issueId
+                    '''
                     def issueId = bat(
                         returnStdout: true,
-                        script: '''@powershell -NoProfile -Command "
-                            $json = Get-Content step1_response.json | ConvertFrom-Json;
-                            $json.data.getTestPlans.results[0].issueId
-                        "'''
+                        script: '@powershell -NoProfile -ExecutionPolicy Bypass -File extract_id.ps1'
                     ).trim()
 
-                    echo "issueId du Test Plan : ${issueId}"
+                    echo "✅ issueId du Test Plan : ${issueId}"
 
                     // ── ÉTAPE 2 : récupérer les Test Executions avec leurs labels ───
                     def graphqlStep2 = """{"query":"{ getTestPlan(issueId: \\"${issueId}\\") { testExecutions(limit: 50) { results { issueId jira(fields: [\\"key\\", \\"labels\\"]) } } } }"}"""
@@ -58,22 +57,26 @@ pipeline {
 
                     bat 'type step2_response.json'
 
-                    // Filtrer les Test Executions ayant le label TNR
+                    // ✅ Script PS1 externe pour filtrer par label
                     def tnrLabel = params.TNR_LABEL
+                    writeFile file: 'filter_exec.ps1', text: """
+                        \$json = Get-Content step2_response.json | ConvertFrom-Json
+                        \$executions = \$json.data.getTestPlan.testExecutions.results
+                        \$filtered = \$executions | Where-Object {
+                            \$_.jira.fields.labels -contains '${tnrLabel}'
+                        }
+                        if (-not \$filtered) {
+                            Write-Error 'Aucune Test Execution avec le label ${tnrLabel}'
+                            exit 1
+                        }
+                        (\$filtered | ForEach-Object { \$_.jira.key }) -join ';'
+                    """
                     def execKeys = bat(
                         returnStdout: true,
-                        script: """@powershell -NoProfile -Command "
-                            \\$json = Get-Content step2_response.json | ConvertFrom-Json;
-                            \\$executions = \\$json.data.getTestPlan.testExecutions.results;
-                            \\$filtered = \\$executions | Where-Object {
-                                \\$_.jira.fields.labels -contains '${tnrLabel}'
-                            };
-                            if (-not \\$filtered) { Write-Error 'Aucune Test Execution avec le label ${tnrLabel}'; exit 1 }
-                            (\\$filtered | ForEach-Object { \\$_.jira.key }) -join ';'
-                        """
+                        script: '@powershell -NoProfile -ExecutionPolicy Bypass -File filter_exec.ps1'
                     ).trim()
 
-                    echo "✅ Test Executions ${params.TNR_LABEL} trouvées : ${execKeys}"
+                    echo "✅ Test Executions [${params.TNR_LABEL}] trouvées : ${execKeys}"
                     env.TNR_EXEC_KEYS = execKeys
                 }
             }
@@ -82,7 +85,6 @@ pipeline {
         stage('Export features') {
             steps {
                 echo "Export des features depuis : ${env.TNR_EXEC_KEYS}"
-
                 script {
                     bat 'if not exist "src\\test\\resources\\features" mkdir "src\\test\\resources\\features"'
 
@@ -111,7 +113,6 @@ pipeline {
         always {
             echo 'Importation des résultats vers Xray...'
             script {
-                // Les tags @POEI2-XXXX dans les .feature guident l'import automatiquement
                 bat """curl -X POST ^
                     -H "Content-Type: application/json" ^
                     -H "Authorization: Bearer %TOKEN%" ^
