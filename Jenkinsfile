@@ -32,7 +32,6 @@ pipeline {
                         "https://xray.cloud.getxray.app/api/v2/graphql" ^
                         -o step1_response.json"""
 
-                    // ✅ Script PS1 externe → zéro problème d'échappement
                     writeFile file: 'extract_id.ps1', text: '''
                         $json = Get-Content step1_response.json | ConvertFrom-Json
                         $json.data.getTestPlans.results[0].issueId
@@ -57,13 +56,13 @@ pipeline {
 
                     bat 'type step2_response.json'
 
-                    // ✅ Script PS1 externe pour filtrer par label
+                    // ── ÉTAPE 3 : filtrer par label ─────────────────────────────────
                     def tnrLabel = params.TNR_LABEL
                     writeFile file: 'filter_exec.ps1', text: """
                         \$json = Get-Content step2_response.json | ConvertFrom-Json
                         \$executions = \$json.data.getTestPlan.testExecutions.results
                         \$filtered = \$executions | Where-Object {
-                            \$_.jira.fields.labels -contains '${tnrLabel}'
+                            \$_.jira.labels -contains '${tnrLabel}'
                         }
                         if (-not \$filtered) {
                             Write-Error 'Aucune Test Execution avec le label ${tnrLabel}'
