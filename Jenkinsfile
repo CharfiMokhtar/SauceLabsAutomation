@@ -111,23 +111,30 @@ pipeline {
 
     post {
         always {
-            echo 'Importation des résultats vers Xray...'
             script {
-                // Importer séparément vers chaque Test Execution trouvée
+                if (!env.TNR_EXEC_KEYS) {
+                    echo '⚠️ Aucune Test Execution trouvée, import ignoré.'
+                    return
+                }
                 def keys = env.TNR_EXEC_KEYS.split(';')
                 keys.each { execKey ->
-                    def infoJson = """{"fields": {"project": {"key": "POEI2"}, "issuetype": {"name": "Test Execution"}}, "xrayFields": {"testExecutionKey": "${execKey}"}}"""
+                    // Format Xray JSON natif avec testExecutionKey
+                    def infoJson = """{
+                        "info": {
+                            "project": "POEI2",
+                            "testExecutionKey": "${execKey}"
+                        }
+                    }"""
                     writeFile file: "info_${execKey}.json", text: infoJson
 
                     bat """curl -X POST ^
                         -H "Authorization: Bearer %TOKEN%" ^
+                        -H "Content-Type: multipart/form-data" ^
                         -F "info=@info_${execKey}.json;type=application/json" ^
                         -F "results=@target/cucumber.json;type=application/json" ^
                         "https://xray.cloud.getxray.app/api/v2/import/execution/cucumber/multipart" """
                 }
             }
         }
-        success { echo 'Tests exécutés avec succès 🎉' }
-        failure { echo 'Des tests ont échoué ❌' }
     }
 }
