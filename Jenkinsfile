@@ -34,28 +34,29 @@ pipeline {
 
     post {
         always {
-            echo 'Importation des résultats vers le ticket POEI2-1176...'
+            echo 'Importation des résultats d\'exécution vers Xray...'
 
             script {
-                // La structure DOIT être "info" pour l'API Cucumber Multipart
                 def metadataMap = [
-                    info: [
+                    fields: [
+                        project: [key: "POEI2"],
+                        testExecKey: "POEI2-1176",
                         summary: "${params.EXEC_NAME} - ${params.TEST_PLAN} - build#${env.BUILD_NUMBER}".toString(),
                         description: "Execution automatique generee par Jenkins",
+                        issuetype: [name: "Test Execution"],
+                        labels: ["Mokhtar"],
+                        assignee: [accountId: "712020:0ed66870-3f6d-4737-9c2f-d4215f3c29df"]
+                    ],
+                    xrayFields: [
                         testPlanKey: params.TEST_PLAN
                     ]
                 ]
-
                 def metadataJson = groovy.json.JsonOutput.toJson(metadataMap)
+
                 writeFile file: 'info.json', text: metadataJson
 
-                // On affiche pour vérification
                 bat 'type info.json'
-
-                // L'URL doit être entre guillemets doubles pour que le shell Windows ne coupe pas après le '?'
-                withCredentials([string(credentialsId: 'XRAY_TOKEN_ID', variable: 'TOKEN')]) {
-                    bat "curl -H \"Authorization: Bearer %TOKEN%\" -F \"info=@info.json;type=application/json\" -F \"results=@target/cucumber.json\" \"https://xray.cloud.getxray.app/api/v2/import/execution/cucumber/multipart?testExecKey=POEI2-1176\""
-                }
+                bat 'curl -H "Content-Type: multipart/form-data" -X POST -F "info=@info.json;type=application/json" -F "results=@target/cucumber.json" -H "Authorization: Bearer %TOKEN%" https://xray.cloud.getxray.app/api/v2/import/execution/cucumber/multipart'
             }
         }
 
