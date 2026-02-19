@@ -7,7 +7,7 @@ pipeline {
 
     parameters {
         string(name: 'SELENIUM_BROWSER', defaultValue: 'CHROME')
-        string(name: 'TEST_PLAN', defaultValue: 'POEI2-989')
+        string(name: 'TEST_EXEC', defaultValue: 'POEI2-1190')
         string(name: 'URL_GRID', defaultValue: 'http://172.16.14.164:4449/wd/hub')
         string(name: 'EXEC_NAME', defaultValue: 'Execution Jenkins')
     }
@@ -35,27 +35,9 @@ pipeline {
     post {
         always {
             echo 'Importation des résultats d\'exécution vers Xray...'
+            def resultsFile = "target/cucumber.json"
+            bat 'curl -H "Content-Type: application/json" -X POST -H "Authorization: Bearer %TOKEN%" --data @${resultsFile} "https://xray.cloud.getxray.app/api/v1/import/execution/cucumber?testExecKey=${params.TEST_EXEC}'
 
-            script {
-                def metadataMap = [
-                    fields: [
-                        project: [key: "POEI2"],
-                        summary: "${params.EXEC_NAME} - ${params.TEST_PLAN}".toString(),
-                        description: "Execution automatique generee par Jenkins",
-                        issuetype: [name: "Test Execution"],
-                        labels: ["Mokhtar"]
-                    ],
-                    xrayFields: [
-                        testPlanKey: params.TEST_PLAN
-                    ]
-                ]
-                def metadataJson = groovy.json.JsonOutput.toJson(metadataMap)
-
-                writeFile file: 'info.json', text: metadataJson
-
-                bat 'type info.json'
-                bat 'curl -H "Content-Type: multipart/form-data" -X POST -F "info=@info.json;type=application/json" -F "results=@target/cucumber.json" -H "Authorization: Bearer %TOKEN%" https://xray.cloud.getxray.app/api/v2/import/execution/cucumber/multipart'
-            }
         }
 
         success {
