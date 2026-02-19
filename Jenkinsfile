@@ -47,7 +47,7 @@ pipeline {
                         assignee: [accountId: "712020:0ed66870-3f6d-4737-9c2f-d4215f3c29df"]
                     ],
                     xrayFields: [
-                        testExecutionKey: "POEI2-1176"
+                        testExecutionKey: "POEI2-1176",
                         testPlanKey: params.TEST_PLAN
                     ]
                 ]
