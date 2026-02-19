@@ -55,7 +55,7 @@ pipeline {
                 writeFile file: 'info.json', text: metadataJson
 
                 bat 'type info.json'*/
-                bat 'curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer %TOKEN%" --data "@target/cucumber.json" "https://xray.cloud.getxray.app/api/v2/import/execution/cucumber?testExecutionKey=POEI2-1176"
+                bat 'curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer %TOKEN%" --data "@target/cucumber.json" "https://xray.cloud.getxray.app/api/v2/import/execution/cucumber?testExecutionKey=POEI2-1176"'
             }
         }
 
