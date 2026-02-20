@@ -16,12 +16,25 @@ pipeline {
 
         stage('Export features') {
             steps {
-                echo 'Exportation des features depuis Xray...'
-                bat 'curl -H "Content-Type: application/json" -X GET -H "Authorization: Bearer %TOKEN%"  "https://xray.cloud.getxray.app/api/v1/export/cucumber?keys=%TEST_EXEC%" --output features.zip'
-                bat 'if exist "src/test/resources/features" rd /s /q "src/test/resources/features"'
-                bat 'mkdir "src/test/resources/features"'
-                bat 'tar -xf features.zip -C src/test/resources/features'
-                bat 'del features.zip'
+                script {
+                            def tickets = params.TEST_EXEC.tokenize(',')
+                            tickets.each { ticket ->
+                                def cleanTicket = ticket.trim()
+
+                                // Export des features pour ce ticket uniquement
+                                bat "curl -H \"Content-Type: application/json\" -X GET -H \"Authorization: Bearer %TOKEN%\" \"https://xray.cloud.getxray.app/api/v1/export/cucumber?keys=${cleanTicket}\" --output features.zip"
+                                bat 'if exist "src/test/resources/features" rd /s /q "src/test/resources/features"'
+                                bat 'mkdir "src/test/resources/features"'
+                                bat 'tar -xf features.zip -C src/test/resources/features'
+                                bat 'del features.zip'
+
+                                // Exécution des tests
+                                bat "mvn clean test -DurlGrid=%URL_GRID%"
+
+                                // Import des résultats
+                                bat "curl -H \"Content-Type: application/json\" -X POST -H \"Authorization: Bearer %TOKEN%\" --data @target/cucumber.json \"https://xray.cloud.getxray.app/api/v1/import/execution/cucumber?testExecKey=${cleanTicket}\""
+                            }
+                        }
             }
         }
 
