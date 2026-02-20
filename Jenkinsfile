@@ -35,12 +35,23 @@ pipeline {
 
     post {
         always {
-            echo 'Importation des résultats d\'exécution vers Xray...'
-
             script {
-                bat 'curl -H "Content-Type: application/json" -X POST -H "Authorization: Bearer %TOKEN%" --data @target/cucumber.json "https://xray.cloud.getxray.app/api/v1/import/execution/cucumber"'
+                if (fileExists('target/cucumber.json')) {
+                    // On transforme la chaîne "ID1, ID2" en une liste Groovy [ID1, ID2]
+                    def tickets = params.TEST_EXEC_LIST.split(',')
+
+                    tickets.each { ticket ->
+                        def cleanTicket = ticket.trim() // On enlève les espaces éventuels
+                        echo "Importation des résultats vers le ticket : ${cleanTicket}"
+
+                        bat """
+                        curl -H "Content-Type: application/json" -X POST -H "Authorization: Bearer %TOKEN%" --data @target/cucumber.json "https://xray.cloud.getxray.app/api/v1/import/execution/cucumber?testExecKey=${cleanTicket}"
+                        """
+                    }
+                }
             }
         }
+
 
         success {
             echo 'Tests exécutés avec succès 🎉'
