@@ -3,7 +3,6 @@ pipeline {
 
     environment {
         TOKEN = credentials('TOKEN')
-        JAVA_TOOL_OPTIONS = '-Dfile.encoding=UTF-8'
     }
 
     parameters {
@@ -14,13 +13,6 @@ pipeline {
     }
 
     stages {
-
-        stage('Configuration encodage') {
-            steps {
-                bat 'chcp 65001'
-            }
-        }
-
 
         stage('Export features, test and import results') {
             steps {
