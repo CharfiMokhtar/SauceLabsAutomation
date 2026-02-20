@@ -38,7 +38,7 @@ pipeline {
             script {
                 if (fileExists('target/cucumber.json')) {
                     // On transforme la chaîne "ID1, ID2" en une liste Groovy [ID1, ID2]
-                    def tickets = params.TEST_EXEC_LIST.split(',')
+                    def tickets = params.TEST_EXEC.split(',')
 
                     tickets.each { ticket ->
                         def cleanTicket = ticket.trim() // On enlève les espaces éventuels
