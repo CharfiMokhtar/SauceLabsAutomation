@@ -27,10 +27,8 @@ pipeline {
                 script {
                     def tickets = params.TEST_EXEC.tokenize(',')
                     tickets.each { ticket ->
-                        def cleanTicket = ticket.trim()
-
                         try {
-                            echo "=== Traitement du ticket : ${cleanTicket} ==="
+                            echo "=== Traitement du ticket : ${ticket} ==="
 
                             echo "Export des features..."
                             bat "curl -H \"Content-Type: application/json\" -X GET -H \"Authorization: Bearer %TOKEN%\" \"https://xray.cloud.getxray.app/api/v1/export/cucumber?keys=${cleanTicket}\" --output features.zip"
@@ -45,10 +43,10 @@ pipeline {
                             echo "Import des résultats..."
                             bat "curl -H \"Content-Type: application/json\" -X POST -H \"Authorization: Bearer %TOKEN%\" --data @target/cucumber.json \"https://xray.cloud.getxray.app/api/v1/import/execution/cucumber?testExecKey=${cleanTicket}\""
 
-                            echo "=== Ticket ${cleanTicket} traité avec succès ✅ ==="
+                            echo "=== Ticket ${ticket} traité avec succès ✅ ==="
 
                         } catch (Exception e) {
-                            echo "=== Erreur sur le ticket ${cleanTicket} : ${e.message} ❌ ==="
+                            echo "=== Erreur sur le ticket ${ticket} : ${e.message} ❌ ==="
                             currentBuild.result = 'UNSTABLE'
                         }
                     }
