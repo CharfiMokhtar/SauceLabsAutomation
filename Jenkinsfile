@@ -22,7 +22,7 @@ pipeline {
                         echo "=== Traitement du ticket : ${ticket} ==="
 
                         echo "Export des features..."
-                        bat "curl -H \"Content-Type: application/json\" -X GET -H \"Authorization: Bearer %TOKEN%n\" \"https://xray.cloud.getxray.app/api/v1/export/cucumber?keys=${ticket}\" --output features.zip"
+                        bat "curl -H \"Content-Type: application/json\" -X GET -H \"Authorization: Bearer %TOKEN%\" \"https://xray.cloud.getxray.app/api/v1/export/cucumber?keys=${ticket}\" --output features.zip"
                         bat 'if exist "src/test/resources/features" rd /s /q "src/test/resources/features"'
                         bat 'mkdir "src/test/resources/features"'
                         bat 'tar -xf features.zip -C src/test/resources/features'
@@ -33,6 +33,8 @@ pipeline {
 
                         echo "Import des résultats..."
                         bat "curl -H \"Content-Type: application/json\" -X POST -H \"Authorization: Bearer %TOKEN%\" --data @target/cucumber.json \"https://xray.cloud.getxray.app/api/v1/import/execution/cucumber?testExecKey=${ticket}\""
+
+                        echo "============= mvnResult ${mvnResult} =============="
 
                         if (mvnResult != 0) {
                             echo "=== Des tests ont échoué sur le ticket ${ticket} ⚠️ ==="
