@@ -48,7 +48,7 @@ pipeline {
         }
 
         unstable {
-            echo 'Certains tickets ont rencontré des erreurs ⚠️'
+            echo 'Des tests ont échoués ⚠️'
         }
 
         failure {
