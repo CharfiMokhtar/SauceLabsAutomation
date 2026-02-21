@@ -35,7 +35,7 @@ pipeline {
                         }
 
                         echo "Import des résultats..."
-                        bat "curl -H \"Content-Type: application/json\" -X POST -H \"Authorization: Bearer %TOKEN%n\" --data @target/cucumber.json \"https://xray.cloud.getxray.app/api/v1/import/execution/cucumber?testExecKey=${ticket}\""
+                        bat "curl -H \"Content-Type: application/json\" -X POST -H \"Authorization: Bearer %TOKEN%\" --data @target/cucumber.json \"https://xray.cloud.getxray.app/api/v1/import/execution/cucumber?testExecKey=${ticket}\""
                     }
                 }
             }
