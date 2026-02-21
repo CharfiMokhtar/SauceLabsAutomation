@@ -7,8 +7,8 @@ pipeline {
 
     parameters {
         string(name: 'SELENIUM_BROWSER', defaultValue: 'CHROME')
-        string(name: 'TEST_PLAN', defaultValue: 'POEI2-989')
-        string(name: 'URL_GRID', defaultValue: 'http://172.16.14.164:4449/wd/hub')
+        string(name: 'TEST_PLAN', defaultValue: 'POEI2-1208')
+        string(name: 'URL_GRID', defaultValue: 'http://192.168.1.30:4444/wd/hub')
         string(name: 'EXEC_NAME', defaultValue: 'Execution Jenkins')
     }
 
