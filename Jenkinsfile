@@ -29,19 +29,13 @@ pipeline {
                         bat 'del features.zip'
 
                         echo "Exécution des tests..."
-                        def mvnResult = bat(script: "mvn clean test -DurlGrid=%URL_GRID% -Dmaven.test.failure.ignore=true", returnStatus: true)
+
+                        catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+                            def mvnResult = bat "mvn clean test -DurlGrid=%URL_GRID%"
+                        }
 
                         echo "Import des résultats..."
                         bat "curl -H \"Content-Type: application/json\" -X POST -H \"Authorization: Bearer %TOKEN%\" --data @target/cucumber.json \"https://xray.cloud.getxray.app/api/v1/import/execution/cucumber?testExecKey=${ticket}\""
-
-                        echo "============= mvnResult ${mvnResult} =============="
-
-                        if (mvnResult != 0) {
-                            echo "=== Des tests ont échoué sur le ticket ${ticket} ⚠️ ==="
-                            currentBuild.result = 'UNSTABLE'
-                        } else {
-                            echo "=== Ticket ${ticket} traité avec succès ✅ ==="
-                        }
                     }
                 }
             }
