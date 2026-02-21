@@ -7,64 +7,52 @@ pipeline {
 
     parameters {
         string(name: 'SELENIUM_BROWSER', defaultValue: 'CHROME')
-        string(name: 'TEST_PLAN', defaultValue: 'POEI2-989')
-        string(name: 'URL_GRID', defaultValue: 'http://172.16.14.164:4449/wd/hub')
+        string(name: 'TEST_EXEC', defaultValue: 'POEI2-1190,POEI2-1191')
+        string(name: 'URL_GRID', defaultValue: 'http://192.168.1.30:4444/wd/hub')
         string(name: 'EXEC_NAME', defaultValue: 'Execution Jenkins')
     }
 
     stages {
 
-        stage('Export features') {
+        stage('Export features, test and import results') {
             steps {
-                echo 'Exportation des features depuis Xray...'
-                bat 'curl -H "Content-Type: application/json" -X GET -H "Authorization: Bearer %TOKEN%"  "https://xray.cloud.getxray.app/api/v1/export/cucumber?keys=%TEST_PLAN%" --output features.zip'
-                bat 'if not exist "src/test/resources/features" mkdir "src/test/resources/features"'
-                bat 'tar -xf features.zip -C src/test/resources/features'
-                bat 'del features.zip'
-            }
-        }
+                script {
+                    def tickets = params.TEST_EXEC.tokenize(',')
+                    tickets.each { ticket ->
+                        echo "=== Traitement du ticket : ${ticket} ==="
 
-        stage('Build & Test') {
-            steps {
-                echo 'Execution des tests Cucumber via Maven...'
-                bat "mvn clean test -DurlGrid=%URL_GRID%"
+                        echo "Export des features..."
+                        bat "curl -H \"Content-Type: application/json\" -X GET -H \"Authorization: Bearer %TOKEN%\" \"https://xray.cloud.getxray.app/api/v1/export/cucumber?keys=${ticket}\" --output features.zip"
+                        bat 'if exist "src/test/resources/features" rd /s /q "src/test/resources/features"'
+                        bat 'mkdir "src/test/resources/features"'
+                        bat 'tar -xf features.zip -C src/test/resources/features'
+                        bat 'del features.zip'
+
+                        echo "Exécution des tests..."
+
+                        catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+                            def mvnResult = bat "mvn clean test -DurlGrid=%URL_GRID%"
+                        }
+
+                        echo "Import des résultats..."
+                        bat "curl -H \"Content-Type: application/json\" -X POST -H \"Authorization: Bearer %TOKEN%\" --data @target/cucumber.json \"https://xray.cloud.getxray.app/api/v1/import/execution/cucumber?testExecKey=${ticket}\""
+                    }
+                }
             }
         }
     }
 
     post {
-        always {
-            echo 'Importation des résultats d\'exécution vers Xray...'
-
-            script {
-                def metadataMap = [
-                    fields: [
-                        project: [key: "POEI2"],
-                        summary: "${params.EXEC_NAME} - ${params.TEST_PLAN}".toString(),
-                        description: "Execution automatique generee par Jenkins",
-                        issuetype: [name: "Test Execution"],
-                        labels: ["Mokhtar"],
-                        assignee: [accountId: "712020:0ed66870-3f6d-4737-9c2f-d4215f3c29df"]
-                    ],
-                    xrayFields: [
-                        testPlanKey: params.TEST_PLAN
-                    ]
-                ]
-                def metadataJson = groovy.json.JsonOutput.toJson(metadataMap)
-
-                writeFile file: 'info.json', text: metadataJson
-
-                bat 'type info.json'
-                bat 'curl -H "Content-Type: multipart/form-data" -X POST -F "info=@info.json;type=application/json" -F "results=@target/cucumber.json" -H "Authorization: Bearer %TOKEN%" https://xray.cloud.getxray.app/api/v2/import/execution/cucumber/multipart'
-            }
+        success {
+            echo 'Tous les tests ont été exécutés avec succès 🎉'
         }
 
-        success {
-            echo 'Tests exécutés avec succès 🎉'
+        unstable {
+            echo 'Des tests ont échoués ⚠️'
         }
 
         failure {
-            echo 'Des tests ont échoué ❌'
+            echo 'Le pipeline a échoué ❌'
         }
     }
 }
