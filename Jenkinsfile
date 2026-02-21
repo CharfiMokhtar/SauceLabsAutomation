@@ -18,8 +18,7 @@ pipeline {
             steps {
                 echo 'Exportation des features depuis Xray...'
                 bat 'curl -H "Content-Type: application/json" -X GET -H "Authorization: Bearer %TOKEN%"  "https://xray.cloud.getxray.app/api/v1/export/cucumber?keys=%TEST_PLAN%" --output features.zip'
-                bat 'if exist "src/test/resources/features" rd /s /q "src/test/resources/features"'
-                bat 'mkdir "src/test/resources/features"'
+                bat 'if not exist "src/test/resources/features" mkdir "src/test/resources/features"'
                 bat 'tar -xf features.zip -C src/test/resources/features'
                 bat 'del features.zip'
             }
@@ -41,11 +40,10 @@ pipeline {
                 def metadataMap = [
                     fields: [
                         project: [key: "POEI2"],
-                        summary: "${params.EXEC_NAME} - ${params.TEST_PLAN}".toString(),
+                        summary: "${params.EXEC_NAME} - ${params.TEST_PLAN} - build#${env.BUILD_NUMBER}".toString(),
                         description: "Execution automatique generee par Jenkins",
                         issuetype: [name: "Test Execution"],
-                        labels: ["Mokhtar"],
-                        assignee: [accountId: "712020:0ed66870-3f6d-4737-9c2f-d4215f3c29df"]
+                        labels: ["Mokhtar"]
                     ],
                     xrayFields: [
                         testPlanKey: params.TEST_PLAN
