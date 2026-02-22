@@ -27,7 +27,7 @@ pipeline {
         stage('Build & Test') {
             steps {
                 echo 'Execution des tests Cucumber via Maven...'
-                bat "mvn clean test -DurlGrid=%URL_GRID%"
+                bat 'chcp 65001 && set JAVA_TOOL_OPTIONS=-Dfile.encoding=UTF-8 -Dstdout.encoding=UTF-8 -Dstderr.encoding=UTF-8 && mvn clean test -DurlGrid='
             }
         }
     }
