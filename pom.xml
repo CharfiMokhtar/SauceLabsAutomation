@@ -85,6 +85,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.2.5</version>
                 <configuration>
+                    <encoding>UTF-8</encoding>
                     <argLine>-Dfile.encoding=UTF-8 -Dstdout.encoding=UTF-8 -Dstderr.encoding=UTF-8</argLine>
                     <includes>
                         <include>**/*Runner.java</include>
