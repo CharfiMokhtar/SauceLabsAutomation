@@ -33,7 +33,7 @@ pipeline {
     }
 
     post {
-        always {
+        /*always {
             echo 'Importation des résultats d\'exécution vers Xray...'
 
             script {
@@ -56,7 +56,7 @@ pipeline {
                 bat 'type info.json'
                 bat 'curl -H "Content-Type: multipart/form-data" -X POST -F "info=@info.json;type=application/json" -F "results=@target/cucumber.json" -H "Authorization: Bearer %TOKEN%" https://xray.cloud.getxray.app/api/v2/import/execution/cucumber/multipart'
             }
-        }
+        }*/
 
         success {
             echo 'Tests exécutés avec succès 🎉'
